@@ -41,7 +41,7 @@ variable "ecs_name" {
 }
 
 variable "ecs_cidr_block" {
-  description = "ECS Cluster Name"
+  description = "ECS CIDR block"
   type        = list(string)
 }
 
@@ -115,15 +115,6 @@ variable "http_proxy_port" {
   default     = 3128
 }
 
-variable "system_controls" {
-  description = "A list of node-level sysctls kernel parameters to set on the container instance"
-  type = list(object({
-    name  = string
-    value = string
-  }))
-  default = []
-}
-
 variable "monitoring" {
   description = "Enabling detailed monitoring for launch template instances"
   default     = "true"
@@ -146,4 +137,38 @@ variable "metadata_options_hop_limit" {
 variable "additional_instance_role_policy" {
   description = "Additional policy that can be added to the ECS instances. By default we have SSM access enabled"
   default     = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+variable "asg_protect_from_scale_in" {
+  description = <<-EOT
+  Allows setting instance protection. The Auto Scaling Group will not select instances with this setting
+  for termination during scale in events.
+  EOT
+  type        = bool
+  default     = true
+}
+
+variable "asg_provider_managed_termination_protection" {
+  description = <<-EOT
+  Enables or disables container-aware termination of instances in the auto scaling group when scale-in happens.
+  Valid values are ENABLED and DISABLED.
+  EOT
+  type        = string
+  default     = "ENABLED"
+}
+
+variable "ecs_wait_for_capacity_timeout" {
+  description = "ASG creation wait timeout"
+  type        = string
+  default     = "20m"
+}
+
+variable "ecs_engine_task_cleanup_wait_duration" {
+  description = <<-EOT
+  Time to wait from when a task is stopped until the Docker container is removed. As this removes the Docker container
+  data, be aware that if this value is set too low, you may not be able to inspect your stopped containers or view the
+  logs before they are removed. The minimum duration is 1m; any value shorter than 1 minute is ignored.
+  EOT
+  type        = string
+  default     = "3h"
 }

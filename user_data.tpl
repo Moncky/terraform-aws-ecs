@@ -70,13 +70,6 @@ EOF
     fi
     echo "$$: $(date +%s.%N | cut -b1-13)" > /var/lib/cloud/instance/sem/config_ecs-init_http_proxy
 %{ endif }
-%{ if system_controls != "" }
---==BOUNDARY==
-Content-Type: text/x-shellscript; charset="us-ascii"
-#!/bin/bash
-${system_controls}
-sysctl -p
-%{ endif }
 --==BOUNDARY==
 Content-Type: text/x-shellscript; charset="us-ascii"
 #!/bin/bash
@@ -89,10 +82,7 @@ echo "ECS_CLUSTER=${ecs_cluster_name}" >> /etc/ecs/ecs.config
 echo "ECS_IMAGE_PULL_BEHAVIOR=always" >> /etc/ecs/ecs.config
 echo "ECS_ENABLE_UNTRACKED_IMAGE_CLEANUP=true" >> /etc/ecs/ecs.config
 echo "ECS_ENABLE_SPOT_INSTANCE_DRAINING=true" >> /etc/ecs/ecs.config
+echo "ECS_ENABLE_SPOT_INSTANCE_DRAINING=${ecs_engine_task_cleanup_wait_duration}" >> /etc/ecs/ecs.config
 systemctl enable --now --no-block ecs.service
 systemctl enable --now --no-block amazon-ecs-volume-plugin.service
 --==BOUNDARY==--
-
-
-
-
